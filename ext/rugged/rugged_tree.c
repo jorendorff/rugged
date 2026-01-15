@@ -91,11 +91,14 @@ static int rugged__treecount_cb(const char *root, const git_tree_entry *entry, v
 
 	if (payload->limit >= 0 && payload->count >= payload->limit) {
 		return -1;
-	} else if(git_tree_entry_type(entry) == GIT_OBJ_TREE) {
-		return 0;
+	}
+
+	payload->count++;
+
+	if (git_tree_entry_type(entry) == GIT_OBJ_TREE) {
+		return 0;  /* descend into subtree */
 	} else {
-		++(payload->count);
-		return 1;
+		return 1;  /* skip (blobs have no children) */
 	}
 }
 
@@ -103,11 +106,11 @@ static int rugged__treecount_cb(const char *root, const git_tree_entry *entry, v
  *  call-seq:
  *    tree.count_recursive(limit=nil) -> count
  *
- *  `limit` - The maximum number of blobs to the count in the repository.
- *  Rugged will stop walking the tree after `limit` items to avoid long
- *  execution times.
+ *  `limit` - The maximum number of entries to count in the repository.
+ *  Rugged will stop walking the tree after `limit` entries (blobs and
+ *  trees) have been counted, to avoid long execution times.
  *
- *  Return the number of blobs (up to the limit) contained in the tree and
+ *  Return the number of entries (up to the limit) contained in the tree and
  *  all subtrees.
  */
 static VALUE rb_git_tree_entrycount_recursive(int argc, VALUE* argv, VALUE self)

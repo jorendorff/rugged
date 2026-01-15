@@ -45,9 +45,9 @@ class TreeTest < Rugged::TestCase
     assert_equal @oid, @tree.oid
     assert_equal :tree, @tree.type
     assert_equal 3, @tree.count
-    assert_equal 6, @tree.count_recursive
+    assert_equal 8, @tree.count_recursive  # 6 blobs + 2 trees
     assert_equal 5, @tree.count_recursive(5)
-    assert_equal 6, @tree.count_recursive(10)
+    assert_equal 8, @tree.count_recursive(10)
     assert_raises(TypeError) do
       @tree.count_recursive("NaN")
     end
